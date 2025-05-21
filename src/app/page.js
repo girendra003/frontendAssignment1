@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import socket from '@/app/socket/socket';
 
 export default function HomePage() {
@@ -23,7 +23,7 @@ export default function HomePage() {
     [2, 4, 6],
   ];
 
-  const checkGameEnd = (board) => {
+  const checkGameEnd = useCallback((board) => {
     for (const [a, b, c] of winningCombos) {
       if (board[a] && board[a] === board[b] && board[a] === board[c]) {
         return board[a];
@@ -31,7 +31,7 @@ export default function HomePage() {
     }
     if (board.every(cell => cell)) return 'draw';
     return null;
-  };
+  }, []);
 
   const joinGame = () => {
     if (!gameId.trim()) return;
@@ -65,7 +65,7 @@ export default function HomePage() {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [checkGameEnd]);
 
   const makeMove = (index) => {
     if (!yourTurn || board[index] || winner) return;
@@ -125,7 +125,8 @@ export default function HomePage() {
                 border: '1px solid #ccc'
               }}
             />
-            <button onClick={joinGame}
+            <button
+              onClick={joinGame}
               style={{
                 padding: '0.75rem 1.5rem',
                 fontSize: '1rem',
@@ -180,7 +181,7 @@ export default function HomePage() {
             </div>
 
             {winner && <h3 style={{ color: 'green', marginTop: 20 }}>{winner} wins!</h3>}
-            {isDraw && <h3 style={{ color: 'orange', marginTop: 20 }}>It's a draw!</h3>}
+            {isDraw && <h3 style={{ color: 'orange', marginTop: 20 }}>It&apos;s a draw!</h3>}
 
             {(winner || isDraw) && (
               <button
